@@ -7,9 +7,15 @@
         </div>
         <div>
             <div class="mb-4" v-if="sections.length > 0">
-                <select v-model="section_id">
+                <select @change.prevent="getBranches" v-model="section_id">
                     <option value="null" selected disabled>Выберите раздел</option>
                     <option v-for="section in sections" :value="section.id">{{ section.title }}</option>
+                </select>
+            </div>
+            <div class="mb-4" v-if="branches.length > 0">
+                <select v-model="parent_id">
+                    <option value="null" selected disabled>Выберите ветку</option>
+                    <option v-for="branch in branches" :value="branch.id">{{ branch.title }}</option>
                 </select>
             </div>
             <div class="mb-4">
@@ -34,7 +40,9 @@ export default defineComponent({
     data() {
         return {
             title: '',
-            section_id: null
+            section_id: null,
+            branches: [],
+            parent_id: null
         }
     },
 
@@ -44,7 +52,18 @@ export default defineComponent({
 
     methods: {
         store() {
-            this.$inertia.post('/branches', {section_id: this.section_id, title: this.title})
+            this.$inertia.post('/branches', {
+                section_id: this.section_id,
+                title: this.title,
+                parent_id: this.parent_id
+            })
+        },
+        getBranches() {
+            this.parent_id = null
+            axios.get(`/sections/${this.section_id}/branches`)
+                .then( res => {
+                    this.branches = res.data
+                })
         }
     },
 
