@@ -44,7 +44,7 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        //
+        return inertia('Branch/Show', compact('branch'));
     }
 
     /**
