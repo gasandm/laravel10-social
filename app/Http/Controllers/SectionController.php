@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Section\StoreRequest;
 use App\Http\Requests\Section\UpdateRequest;
 use App\Http\Resources\Branch\BranchResource;
+use App\Http\Resources\Section\SectionResource;
 use App\Http\Resources\Section\SectionWithBranchesResource;
 use App\Models\Section;
 
@@ -17,6 +18,7 @@ class SectionController extends Controller
     {
         $sections = Section::with('branches')->get();
         $sections = SectionWithBranchesResource::collection($sections)->resolve();
+
         return inertia('Section/Index', compact('sections'));
     }
 
@@ -35,6 +37,7 @@ class SectionController extends Controller
     {
         $data = $request->validated();
         Section::firstOrCreate($data);
+
         return redirect()->route('sections.index');
     }
 
@@ -51,7 +54,9 @@ class SectionController extends Controller
      */
     public function edit(Section $section)
     {
-        //
+        $section = SectionResource::make($section)->resolve();
+        
+        return inertia('Section/Edit', compact('section'));
     }
 
     /**
@@ -59,7 +64,10 @@ class SectionController extends Controller
      */
     public function update(UpdateRequest $request, Section $section)
     {
-        //
+        $data = $request->validated();
+        $section->update($data);
+
+        return redirect()->route('sections.index');
     }
 
     /**
