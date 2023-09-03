@@ -14,9 +14,9 @@
                 <div class="text-red-600 text-sm" v-if="this.$page.props.errors.section_id">{{this.$page.props.errors.section_id}}</div>
             </div>
             <div class="mb-4" v-if="branches.length > 0">
-                <select v-model="parent_id">
+                <select v-model="branch.parent_id">
                     <option value="null" selected disabled>Выберите ветку</option>
-                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.title }}</option>
+                    <option v-for="branch_i in branches" :key="branch_i.id" :disabled="branch_i.id === branch.id" :value="branch_i.id">{{ branch_i.title }}</option>
                 </select>
             </div>
             <div class="mb-4">
@@ -24,7 +24,7 @@
                 <div class="text-red-600 text-sm" v-if="this.$page.props.errors.title">{{this.$page.props.errors.title}}</div>
             </div>
             <div>
-                <a class="cursor-pointer block w-1/4 py-2 bg-sky-500 border border-sky-600 text-white text-center" @click.prevent="store">Сохранить</a>
+                <a class="cursor-pointer block w-1/4 py-2 bg-sky-500 border border-sky-600 text-white text-center" @click.prevent="update">Сохранить</a>
             </div>
         </div>
     </div>
@@ -41,9 +41,7 @@ export default defineComponent({
 
     data() {
         return {
-            section_id: null,
             branches: [],
-            parent_id: null
         }
     },
 
@@ -52,9 +50,13 @@ export default defineComponent({
         'branch'
     ],
 
+    mounted() {
+        this.getBranches()
+    },
+
     methods: {
-        store() {
-            this.$inertia.post('/branches', {
+        update() {
+            this.$inertia.patch(`/branches/${this.branch.id}`, {
                 section_id: this.branch.section_id,
                 title: this.branch.title,
                 parent_id: this.branch.parent_id
@@ -62,7 +64,7 @@ export default defineComponent({
         },
         getBranches() {
             this.parent_id = null
-            axios.get(`/branches/${this.branch.section_id}/branches`)
+            axios.get(`/sections/${this.branch.section_id}/branches`)
                 .then( res => {
                     this.branches = res.data
                 })

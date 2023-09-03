@@ -23,7 +23,16 @@ class UpdateRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
+            'parent_id' => 'required|integer|exists:branches,id',
             'section_id' => 'required|integer|exists:sections,id',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'Поле заголовок необходимо для заполнения',
+            'section_id.required' => 'Выберите раздел'
         ];
     }
 }
